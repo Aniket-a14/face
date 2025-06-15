@@ -15,7 +15,7 @@ class GenderNet(nn.Module):
     def __init__(self):
         super(GenderNet, self).__init__()
         self.backbone = models.resnet18(weights=models.ResNet18_Weights.DEFAULT)
-        self.backbone.fc = nn.Linear(self.backbone.fc.in_features, 1)  # Only gender
+        self.backbone.fc = nn.Linear(self.backbone.fc.in_features, 1)  
 
     def forward(self, x):
         return self.backbone(x)
