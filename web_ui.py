@@ -8,7 +8,7 @@ import json
 from src.model import DualHeadFaceNet
 from src.augmentations import get_val_transforms
 
-# Load identity mapping and model
+
 df = pd.read_csv("utkface_processed.csv")
 num_classes = df['identity'].nunique()
 with open("id_to_idx.json") as f:
