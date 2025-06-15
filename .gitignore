@@ -30,7 +30,7 @@ data/
 *.jpg
 *.jpeg
 *.png
-
+.gradio/
 data/
 
 # Logs and outputs
