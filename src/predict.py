@@ -16,7 +16,7 @@ def predict(image_path, model_path, csv_path="utkface_processed.csv"):
 
   
     model = DualHeadFaceNet(num_classes)
-    model.load_state_dict(torch.load(model_path, map_location='cpu'))
+    model.load_state_dict(torch.load(model_path, map_location='cpu'), strict=False)
     model.eval()
     
     transform = get_val_transforms()
