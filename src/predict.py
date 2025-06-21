@@ -6,15 +6,14 @@ from src.augmentations import get_val_transforms
 import pandas as pd
 import json
 
-def predict(image_path, model_path, csv_path="utkface_processed.csv"):
+def predict(image_path, model_path, csv_path="face_processed.csv"):
     df = pd.read_csv(csv_path)
     num_classes = df['identity'].nunique()
     
     with open("id_to_idx.json") as f:
         id_to_idx = json.load(f)
-    idx_to_id = {v: k for k, v in id_to_idx.items()}
+    idx_to_id = {int(v): k for k, v in id_to_idx.items()}
 
-  
     model = DualHeadFaceNet(num_classes)
     model.load_state_dict(torch.load(model_path, map_location='cpu'), strict=False)
     model.eval()
@@ -23,13 +22,12 @@ def predict(image_path, model_path, csv_path="utkface_processed.csv"):
     img = Image.open(image_path).convert("RGB")
     img_tensor = transform(image=np.array(img))["image"].unsqueeze(0)
 
- 
     with torch.no_grad():
         gender_logits, id_logits = model(img_tensor)
         gender = torch.sigmoid(gender_logits).item()
         predicted_id_idx = torch.argmax(id_logits).item()
 
-    predicted_id = idx_to_id[predicted_id_idx]
+    predicted_id = idx_to_id[int(predicted_id_idx)]
     print(f"Predicted Gender: {'Male' if gender < 0.5 else 'Female'}")
     print(f"Predicted identity: {predicted_id}")
 

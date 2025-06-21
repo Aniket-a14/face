@@ -1,29 +1,29 @@
 import os
-import glob
 import pandas as pd
 
-def parse_utkface(directory):
-    image_paths, genders, ids = [], [], []
-    for path in glob.glob(os.path.join(directory, "*.jpg.chip.jpg")):
-        filename = os.path.basename(path)
-        parts = filename.split("_")
-        try:
-            gender = int(parts[1])
-            identity = int(parts[3].split('.')[0])
-            image_paths.append(path)
-            genders.append(gender)
-            ids.append(identity)
-        except (IndexError, ValueError):
+def parse_face_folder(root_dir):
+    image_paths, genders, identities = [], [], []
+    for gender_folder in ["male", "female"]:
+        gender_val = 1 if gender_folder == "male" else 0
+        folder_path = os.path.join(root_dir, gender_folder)
+        if not os.path.isdir(folder_path):
             continue
+        for fname in os.listdir(folder_path):
+            if fname.lower().endswith((".jpg", ".jpeg", ".png")):
+                image_paths.append(os.path.join(folder_path, fname))
+                genders.append(gender_val)
+                # Use filename (without extension) as identity
+                identity = os.path.splitext(fname)[0]
+                identities.append(identity)
     df = pd.DataFrame({
-        'image_path': image_paths,
-        'gender': genders,
-        'identity': ids
+        "image_path": image_paths,
+        "gender": genders,
+        "identity": identities
     })
     return df
 
 if __name__ == "__main__":
-    input_dir = "data/raw/UTKFace"
-    df = parse_utkface(input_dir)
-    df.to_csv("utkface_processed.csv", index=False)
-    print("✅ Dataset processed and saved as utkface_processed.csv")
+    input_dir = "data/raw"
+    df = parse_face_folder(input_dir)
+    df.to_csv("face_processed.csv", index=False)
+    print("✅ Dataset processed and saved as face_processed.csv")

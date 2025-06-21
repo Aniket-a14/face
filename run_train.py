@@ -6,7 +6,7 @@ from src.augmentations import get_train_transforms
 from src.train import train_model
 import json
 
-df = pd.read_csv("utkface_processed.csv")
+df = pd.read_csv("face_processed.csv")
 image_paths = df['image_path'].tolist()
 genders = df['gender'].tolist()
 ids = df['identity'].tolist()

@@ -1,15 +1,15 @@
-# Face Gender & Identity Recognition
+# Face Gender Recognition
 
-This project provides a pipeline for training and running inference on a face dataset (e.g., UTKFace) to predict both gender and identity using deep learning with PyTorch and albumentations.
+This project provides a pipeline for training and running inference on a face dataset (with images organized in `data/raw/male/` and `data/raw/female/`) to predict gender using deep learning with PyTorch and albumentations.
 
 ---
 
 ## Features
 
-- **Dual-head model:** Predicts both gender (binary) and identity (multi-class) from face images.
-- **Data augmentation:** Uses albumentations for robust training.
-- **Training & inference scripts:** Easy-to-use scripts for training, single-image prediction, and real-time webcam prediction.
-- **Identity mapping:** Handles mapping between dataset identity labels and model class indices.
+- **Gender prediction** from face images using a ResNet18-based model.
+- **Data augmentation** for robust training.
+- **Training, single-image prediction, and real-time webcam prediction** scripts.
+- **Automatic dataset parsing** from folder structure.
 
 ---
 
@@ -21,16 +21,16 @@ face/
 ├── src/
 │   ├── augmentations.py      # Data augmentation and transforms
 │   ├── dataset.py            # Custom PyTorch dataset
-│   ├── model.py              # DualHeadFaceNet model definition
+│   ├── model.py              # DualHeadFaceNet model definition (gender head used)
 │   ├── train.py              # Training loop
-│   ├── predict.py            # Single-image prediction
-│   ├── realtime_predict.py   # Real-time webcam prediction
+│   ├── predict.py            # Single-image gender prediction
+│   ├── realtime_predict.py   # Real-time webcam gender prediction
 │   └── __init__.py
 │
 ├── run_train.py              # Training entry point
-├── parse_utkface.py          # Script to parse UTKFace dataset into CSV
-├── utkface_processed.csv     # Processed dataset CSV (generated)
-├── id_to_idx.json            # Identity-to-index mapping (generated)
+├── parse_utkface.py          # Script to parse dataset folders into CSV
+├── face_processed.csv        # Processed dataset CSV (generated)
+├── id_to_idx.json            # Identity-to-index mapping (generated, not used for gender-only)
 ├── model.pt                  # Trained model weights (generated)
 ├── .gitignore
 └── README.md
@@ -50,14 +50,13 @@ face/
     ```
 
 2. **Prepare the dataset:**
-    - Download the [UTKFace dataset](https://susanqq.github.io/UTKFace/).
-    - Place images in `data/raw/UTKFace/`.
+    - Place your images in `data/raw/male/` and `data/raw/female/` folders.
 
 3. **Parse the dataset:**
     ```sh
     python parse_utkface.py
     ```
-    This will generate `utkface_processed.csv`.
+    This will generate `face_processed.csv`.
 
 ---
 
@@ -70,7 +69,6 @@ python run_train.py
 ```
 
 - This will train the model and save weights as `model.pt`.
-- It will also save the identity-to-index mapping as `id_to_idx.json`.
 
 ---
 
@@ -81,9 +79,9 @@ python run_train.py
 ```sh
 python -m src.predict path/to/image.jpg
 ```
-- Prints predicted gender and identity.
+- Prints predicted gender.
 
-### Real-time Webcam Prediction
+### Real-time Webcam Gender Prediction
 
 ```sh
 python -m src.realtime_predict
@@ -121,4 +119,4 @@ python -m src.realtime_predict
 
 ---
 
-##
+## License

@@ -3,38 +3,17 @@ import cv2.data
 import torch
 from PIL import Image
 import numpy as np
-import torchvision.models as models
-import torch.nn as nn
-import albumentations as A
-from albumentations.pytorch import ToTensorV2
 import pandas as pd
 from src.augmentations import get_val_transforms
 from src.model import DualHeadFaceNet
-
-class GenderNet(nn.Module):
-    def __init__(self):
-        super(GenderNet, self).__init__()
-        self.backbone = models.resnet18(weights=models.ResNet18_Weights.DEFAULT)
-        self.backbone.fc = nn.Linear(self.backbone.fc.in_features, 1)  
-
-    def forward(self, x):
-        return self.backbone(x)
-
-def get_transforms():
-    return A.Compose([
-        A.Resize(224, 224),
-        A.Normalize(),
-        ToTensorV2()
-    ])
+import json
 
 def realtime_predict(model_path):
-    csv_path = "utkface_processed.csv"
+    csv_path = "face_processed.csv"
     df = pd.read_csv(csv_path)
     num_classes = df['identity'].nunique()
-    id_to_idx = {id_: i for i, id_ in enumerate(sorted(df['identity'].unique()))}
-    idx_to_id = {v: k for k, v in id_to_idx.items()}
 
-    model = DualHeadFaceNet(num_id_classes=num_classes)
+    model = DualHeadFaceNet(num_classes)
     model.load_state_dict(torch.load(model_path, map_location="cpu"), strict=False)
     model.eval()
 
@@ -62,12 +41,13 @@ def realtime_predict(model_path):
                 continue
 
             with torch.no_grad():
-                gender_logit, id_logits = model(face_tensor)
-                gender = torch.sigmoid(gender_logit).item()
+                gender_logit, _ = model(face_tensor)
+                gender_prob = torch.sigmoid(gender_logit).item()
 
-            label = f"{'Male' if gender < 0.5 else 'Female'}"
+            gender_label = "Male" if gender_prob > 0.5 else "Female"
+
             cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 2)
-            cv2.putText(frame, label, (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
+            cv2.putText(frame, gender_label, (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
 
         cv2.imshow("Real-time Gender Prediction", frame)
 
