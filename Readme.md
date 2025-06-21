@@ -120,3 +120,6 @@ python -m src.realtime_predict
 ---
 
 ## License
+
+Apache License 2.0
+---
